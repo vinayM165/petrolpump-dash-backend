@@ -1,0 +1,270 @@
+{
+	"info": {
+		"_postman_id": "a96e4b64-9be6-c7ff510d8283",
+		"name": "PetrolPump Dash API",
+		"description": "API collection for PetrolPump Backend with JWT Authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Fuel Purchases",
+			"item": [
+				{
+					"name": "Create Fuel Purchase",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fuelType\": \"Diesel\",\n    \"quantityLiters\": 500,\n    \"purchaseRate\": 89.50,\n    \"invoiceNumber\": \"INV-{{$timestamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/fuel-purchases",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"fuel-purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Fuel Purchases",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/fuel-purchases",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"fuel-purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Fuel Purchase by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/fuel-purchases/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"fuel-purchases",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Daily Readings",
+			"item": [
+				{
+					"name": "Create Daily Reading",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shift\": \"MORNING\",\n    \"petrolTankLiters\": 5200.5,\n    \"dieselTankLiters\": 4800.0,\n    \"cashOnHand\": 25000,\n    \"pump1Nozzle1A\": 12345.6,\n    \"pump1Nozzle1B\": 12350.2,\n    \"pump2Nozzle2A\": 9870.4,\n    \"pump2Nozzle2B\": 9875.1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/daily-readings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"daily-readings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Daily Readings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/daily-readings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"daily-readings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Readings with Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/daily-readings?shift=MORNING",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"daily-readings"
+							],
+							"query": [
+								{
+									"key": "shift",
+									"value": "MORNING"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://petrolpump-dash-backend.onrender.com",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
