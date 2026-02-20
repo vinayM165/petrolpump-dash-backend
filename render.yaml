@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: petrolpump-backend
+    runtime: java
+    buildCommand: ./mvnw clean install -DskipTests
+    startCommand: java -jar target/fuel-purchase-api-1.0.0.jar
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        value: dGhpc0lzQVZlcnlTZWN1cmVTZWNyZXRLZXlGb3JKV1RUb2tlbjEyMzQ1Njc4OTA=
+      - key: JWT_EXPIRATION
+        value: 86400000
