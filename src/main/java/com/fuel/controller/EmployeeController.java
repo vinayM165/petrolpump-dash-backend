@@ -1,10 +1,14 @@
 package com.fuel.controller;
 
+import com.fuel.dto.EmployeeRegistrationRequest;
 import com.fuel.model.Employee;
+import com.fuel.model.User;
 import com.fuel.repository.EmployeeRepository;
+import com.fuel.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,18 +21,51 @@ import java.util.Map;
 public class EmployeeController {
 
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmployeeController(EmployeeRepository employeeRepository) {
+    public EmployeeController(EmployeeRepository employeeRepository,
+                              UserRepository userRepository,
+                              PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // POST /api/employees
+    // POST /api/employees  — admin creates employee + login account in one call
     @PostMapping
-    public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody Employee employee) {
+    public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody EmployeeRegistrationRequest req) {
+
+        // Check for duplicate loginId
+        if (userRepository.existsByUsername(req.getLoginId())) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", "Login ID '" + req.getLoginId() + "' is already taken");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        }
+
+        // 1. Create the User (login account)
+        User user = new User();
+        user.setUsername(req.getLoginId());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setEmail(req.getEmail());
+        user.setRole("EMPLOYEE");
+
+        // 2. Create the Employee profile linked to User
+        Employee employee = new Employee();
+        employee.setName(req.getName());
+        employee.setNumber(req.getNumber());
+        employee.setEmail(req.getEmail());
+        employee.setStatus(req.getStatus() != null ? req.getStatus() : "ACTIVE");
+        employee.setStationId(req.getStationId());
+        employee.setStation(req.getStation());
+        employee.setShift(req.getShift());
+        employee.setUser(user); // CascadeType.ALL saves user automatically
+
         Employee saved = employeeRepository.save(employee);
+
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Employee created successfully");
-        response.put("data", saved);
+        response.put("message", "Employee registered successfully");
+        response.put("data", buildResponse(saved));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -50,39 +87,45 @@ public class EmployeeController {
             employees = employeeRepository.findAll();
         }
 
+        List<Map<String, Object>> list = employees.stream().map(this::buildResponse).toList();
         Map<String, Object> response = new HashMap<>();
-        response.put("data", employees);
-        response.put("count", employees.size());
+        response.put("data", list);
+        response.put("count", list.size());
         return ResponseEntity.ok(response);
     }
 
     // GET /api/employees/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getById(@PathVariable Long id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with id: " + id));
+        Employee employee = findOrThrow(id);
         Map<String, Object> response = new HashMap<>();
-        response.put("data", employee);
+        response.put("data", buildResponse(employee));
         return ResponseEntity.ok(response);
     }
 
-    // PUT /api/employees/{id}
+    // PUT /api/employees/{id}  — update profile fields only (not login credentials)
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long id, @Valid @RequestBody Employee updated) {
-        Employee existing = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with id: " + id));
+    public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
+                                                      @RequestBody EmployeeRegistrationRequest req) {
+        Employee existing = findOrThrow(id);
 
-        existing.setName(updated.getName());
-        existing.setNumber(updated.getNumber());
-        existing.setStatus(updated.getStatus());
-        existing.setStationId(updated.getStationId());
-        existing.setStation(updated.getStation());
-        existing.setShift(updated.getShift());
+        existing.setName(req.getName());
+        existing.setNumber(req.getNumber());
+        existing.setEmail(req.getEmail());
+        if (req.getStatus() != null) existing.setStatus(req.getStatus());
+        existing.setStationId(req.getStationId());
+        existing.setStation(req.getStation());
+        existing.setShift(req.getShift());
+
+        // Update password if provided
+        if (req.getPassword() != null && !req.getPassword().isBlank()) {
+            existing.getUser().setPassword(passwordEncoder.encode(req.getPassword()));
+        }
 
         Employee saved = employeeRepository.save(existing);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Employee updated successfully");
-        response.put("data", saved);
+        response.put("data", buildResponse(saved));
         return ResponseEntity.ok(response);
     }
 
@@ -92,9 +135,30 @@ public class EmployeeController {
         if (!employeeRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with id: " + id);
         }
-        employeeRepository.deleteById(id);
+        employeeRepository.deleteById(id);  // CascadeType.ALL also deletes the linked User
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Employee deleted successfully");
         return ResponseEntity.ok(response);
+    }
+
+    // --- Helper ---
+    private Employee findOrThrow(Long id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found with id: " + id));
+    }
+
+    private Map<String, Object> buildResponse(Employee e) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("id", e.getId());
+        m.put("name", e.getName());
+        m.put("number", e.getNumber());
+        m.put("email", e.getEmail());
+        m.put("status", e.getStatus());
+        m.put("stationId", e.getStationId());
+        m.put("station", e.getStation());
+        m.put("shift", e.getShift());
+        m.put("loginId", e.getLoginId());
+        m.put("createdAt", e.getCreatedAt());
+        return m;
     }
 }
