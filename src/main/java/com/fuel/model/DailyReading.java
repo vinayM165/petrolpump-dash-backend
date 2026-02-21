@@ -30,6 +30,12 @@ public class DailyReading {
     @Column(name = "diesel_tank_liters", nullable = false)
     private Double dieselTankLiters;
 
+    // --- Rates ---
+    @NotNull(message = "Petrol rate is required")
+    @PositiveOrZero(message = "Petrol rate must be >= 0")
+    @Column(name = "petrol_rate", nullable = false)
+    private BigDecimal petrolRate;
+
     // --- Cash On Hand ---
     @NotNull(message = "Cash on hand is required")
     @PositiveOrZero(message = "Cash must be >= 0")
@@ -108,4 +114,7 @@ public class DailyReading {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public BigDecimal getPetrolRate() { return petrolRate; }
+    public void setPetrolRate(BigDecimal petrolRate) { this.petrolRate = petrolRate; }
 }
