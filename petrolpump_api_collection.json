@@ -160,7 +160,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"shift\": \"MORNING\",\n    \"petrolTankLiters\": 5200.5,\n    \"dieselTankLiters\": 4800.0,\n    \"cashOnHand\": 25000,\n    \"pump1Nozzle1A\": 12345.6,\n    \"pump1Nozzle1B\": 12350.2,\n    \"pump2Nozzle2A\": 9870.4,\n    \"pump2Nozzle2B\": 9875.1\n}",
+							"raw": "{\n    \"shift\": \"MORNING\",\n    \"petrolTankLiters\": 5200.5,\n    \"dieselTankLiters\": 4800.0,\n    \"cashOnHand\": 25000,\n    \"pump1Nozzle1A\": 12345.6,\n    \"pump1Nozzle1B\": 12350.2,\n    \"pump2Nozzle2A\": 9870.4,\n    \"pump2Nozzle2B\": 9875.1,\n    \"petrolRate\": 102.75\n}",
 							"options": {
 								"raw": {
 									"language": "json"
