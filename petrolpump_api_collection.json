@@ -269,7 +269,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Arun Sharma\",\n    \"number\": \"+91 9576385702\",\n    \"status\": \"ACTIVE\",\n    \"stationId\": \"00111\",\n    \"station\": \"First Thuli\",\n    \"shift\": \"MORNING\"\n}",
+							"raw": "{\n    \"name\": \"Arun Sharma\",\n    \"number\": \"+91 9576385702\",\n    \"email\": \"arun@petrolpump.com\",\n    \"status\": \"ACTIVE\",\n    \"stationId\": \"00111\",\n    \"station\": \"First Thuli\",\n    \"shift\": \"MORNING\",\n    \"loginId\": \"arun.sharma\",\n    \"password\": \"emp123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
