@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "a96e4b64-9be6-c7ff510d8283",
 		"name": "PetrolPump Dash API",
-		"description": "API collection for PetrolPump Backend with JWT Authentication",
+		"description": "API collection for PetrolPump Backend with JWT Authentication. Base URL: https://petrolpump-dash-backend.onrender.com",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -47,6 +47,7 @@
 									"var jsonData = pm.response.json();",
 									"if (jsonData.token) {",
 									"    pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+									"    console.log(\"Token saved:\", jsonData.token.substring(0, 30) + \"...\");",
 									"}"
 								],
 								"type": "text/javascript"
@@ -199,6 +200,25 @@
 					"response": []
 				},
 				{
+					"name": "Get Daily Reading by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/daily-readings/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"daily-readings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Readings with Filters",
 					"request": {
 						"method": "GET",
@@ -217,6 +237,210 @@
 									"key": "shift",
 									"value": "MORNING"
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employees",
+			"item": [
+				{
+					"name": "Create Employee",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set(\"employee_id\", jsonData.data.id);",
+									"    console.log(\"Employee ID saved:\", jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Arun Sharma\",\n    \"number\": \"+91 9576385702\",\n    \"status\": \"ACTIVE\",\n    \"stationId\": \"00111\",\n    \"station\": \"First Thuli\",\n    \"shift\": \"MORNING\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Employees",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees/{{employee_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"{{employee_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter by Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees?status=ACTIVE",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE",
+									"description": "ACTIVE or INACTIVE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter by Station ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees?stationId=00111",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							],
+							"query": [
+								{
+									"key": "stationId",
+									"value": "00111"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter by Shift",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees?shift=MORNING",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees"
+							],
+							"query": [
+								{
+									"key": "shift",
+									"value": "MORNING"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Arun Sharma\",\n    \"number\": \"+91 9576385702\",\n    \"status\": \"INACTIVE\",\n    \"stationId\": \"00111\",\n    \"station\": \"First Thuli\",\n    \"shift\": \"MORNING\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees/{{employee_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"{{employee_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees/{{employee_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"{{employee_id}}"
 							]
 						}
 					},
@@ -264,6 +488,11 @@
 		{
 			"key": "jwt_token",
 			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "employee_id",
+			"value": "1",
 			"type": "string"
 		}
 	]
